@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Snake Game</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@700&display=swap');
+
+    canvas {
+      position: fixed;
+      cursor: pointer;
+    }
+
+    p {
+      /* position: absolute; */
+      /* top: 40%; */
+      /* display: block; */
+      color: black;
+      /* background-color: black; */
+    }
+
+    #intro {
+     font-family: 'Noto Sans KR', sans-serif;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- <p id="scoring"></p> -->
+  <p id="intro">
+  <span id='sec'>3</span>초 뒤 시작됩니다.</p>
+
+  <canvas id="playground" width="400" height="400">
+  </canvas>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script>
+    let appleExist = false
+    const canvas = document.getElementById("playground")
+    const ctx = canvas.getContext("2d")
+    ctx.fillStyle = "black"
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+    let player = null
+    let isAlive = true
+    let isPlaying = false
+    let score = 0
+    let direction = 0 // 0: to right 1: to down 2: to left 3: to up
+
+    setTimeout(() => {
+
+      $('html').keydown(event => {
+        // $('#intro').text("<br>")
+        keyPush(event)
+      })
+
+      player = setInterval(() => {
+        if (!isPlaying) {
+          isPlaying = true
+          play()
+          defaultMove()
+          positionChecker()
+          deathChecker()
+          apple()
+          addScore()
+          console.log('playlog: ' + player)
+          isPlaying = false
+        }
+      }, 300 - (score * 30))
+
+    }, 3000);
+
+    // })
+
+    let positionX = 0, positionY = 0
+    const gridSize = 20, tileCount = 20
+    let applePositionX = 0, applePositionY = 0
+
+
+    let snakeX = new Array()   //records position
+    let snakeY = new Array()
+
+    function defaultMove() {
+      switch (direction) {
+        case 2:
+          positionX += -1;
+          positionY += 0;
+          // }
+          break;
+        case 3:
+          positionX += 0;
+          positionY += -1;
+          break;
+        // }
+        case 0:
+          positionX += 1;
+          positionY += 0;
+          break;
+        // }
+        case 1:
+          positionX += 0;
+          positionY += 1;
+          break;
+        // }
+      }
+    }
+
+    function keyPush(event) {
+      if (!isPlaying) {
+        switch (event.code) {
+          case 'ArrowLeft':
+            // positionX += -1;
+            // positionY += 0;
+            if (direction != 0) {
+              direction = 2
+            }
+            break;
+          case 'ArrowUp':
+            // positionX += 0;
+            // positionY += -1;
+            if (direction != 1) {
+              direction = 3
+            }
+            break;
+          case 'ArrowRight':
+            // positionX += 1;
+            // positionY += 0;
+            if (direction != 2) {
+              direction = 0
+            }
+            break;
+          case 'ArrowDown':
+            // positionX += 0;
+            // positionY += 1;
+            if (direction != 3) {
+              direction = 1
+            }
+            break;
+
+        }
+      }
+    }
+    function positionChecker() {
+      if ((positionX === applePositionX) && (positionY === applePositionY)) {
+        appleExist = false
+        score += 1
+        console.log(snakeX)
+        console.log(snakeY)
+      } else {  // if no apple 
+        // remove last position and color black
+        ctx.fillStyle = "black"
+        ctx.fillRect(snakeX.pop() * gridSize, snakeY.pop() * gridSize, gridSize, gridSize)
+      }
+      snakeX.unshift(positionX)
+      snakeY.unshift(positionY)
+
+      for (let snake = 0; snake < snakeX.length; snake++) {
+        ctx.fillStyle = "lime"
+        ctx.fillRect((snakeX[snake] * gridSize), snakeY[snake] * gridSize, gridSize - 2, gridSize - 2)
+      }
+    }
+
+    function deathChecker() {
+      console.log(isAlive)
+      if (isAlive) {
+        edge()
+        for (let snake = 3; snake < snakeX.length; snake++) {
+          if (positionX == snakeX[snake] && positionY == snakeY[snake]) {
+            console.log(positionX, positionY)
+            console.log(snakeX[snake], snakeY[snake])
+            terminator()
+            return false
+          }
+        }
+      }
+    }
+
+    function edge() {
+      if ((positionX < 0) || (positionX > tileCount - 1) ||
+        (positionY < 0) || (positionY > tileCount - 1)) {
+        terminator()
+        return false
+      }
+    }
+
+    function terminator() {
+      clearInterval(player)
+      isAlive = false
+      let record = prompt('The snake is dead.\nScore: ' + score + '\nIf you want to make record, please input your name.')
+      if (!record) {
+        location.reload()
+      } else {
+        location.href='record.jsp?name='+ record +'&score='+ score;
+      }
+
+    }
+
+    function addScore() {
+      $('#intro').text('Score: ' + score)
+    }
+
+    function play() {
+      if (positionX < 0) {
+        positionX = 1
+      }
+      if (positionX > tileCount - 1) {
+        positionX = tileCount - 2
+      }
+      if (positionY < 0) {
+        positionY = 1
+      }
+      if (positionY > tileCount - 1) {
+        positionY = tileCount - 2
+      }
+    }
+
+    function apple() {
+      if (appleExist === true) {
+        return
+      } else {
+        appleExist = true
+        applePositionX = Math.ceil(Math.random() * (tileCount - 1))   //0.0 => 0  1 => 19
+        applePositionY = Math.ceil(Math.random() * (tileCount - 1))
+        console.log(applePositionX, applePositionY)
+      }
+      ctx.fillStyle = "red"
+      ctx.fillRect(applePositionX * gridSize, applePositionY * gridSize, gridSize - 2, gridSize - 2)
+    }
+    // })
+
+  </script>
+</body>
+
+</html>
