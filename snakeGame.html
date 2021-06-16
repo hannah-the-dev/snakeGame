@@ -23,7 +23,7 @@
     }
 
     #intro {
-     font-family: 'Noto Sans KR', sans-serif;
+      font-family: 'Noto Sans KR', sans-serif;
     }
   </style>
 </head>
@@ -31,7 +31,8 @@
 <body>
   <!-- <p id="scoring"></p> -->
   <p id="intro">
-  <span id='sec'>3</span>초 뒤 시작됩니다.</p>
+    <span id="sec">3</span>초 뒤 시작됩니다.
+  </p>
 
   <canvas id="playground" width="400" height="400">
   </canvas>
@@ -47,15 +48,47 @@
     let isPlaying = false
     let score = 0
     let direction = 0 // 0: to right 1: to down 2: to left 3: to up
+    let go = 3;
+    let started = false;
 
-    setTimeout(() => {
+    let starter = null;
+    // while (go > 0) {
+    //   setTimeout(() => {
+    //     document.getElementById('sec').innerHTML = --go;
+    //   }, 1000)
+    // }
 
+    starter = setInterval(() => {
+        // if(!started) {
+          document.getElementById('sec').innerHTML = --go;
+          console.log(go, go <= 0);
+          if (go <= 0) {
+            return;
+            clearInterval(starter);
+            started = true;
+          // }
+        }
+      }, 1000);
+    
+    // let starter = (() => {
+    //   setInterval(() => {
+    //     document.getElementById("sec").innerHTML = --go;
+    //     console.log(go);
+    //     if (go <= 0) {
+    //       clearInterval(starter);
+    //     }
+    //   }, 1000)
+    // })
+    // starter();
+      
+    // let game = (() => {
       $('html').keydown(event => {
         // $('#intro').text("<br>")
         keyPush(event)
-      })
+      });
 
-      player = setInterval(() => {
+      player = (() => {
+        console.log(Math.min(250, score * 30));
         if (!isPlaying) {
           isPlaying = true
           play()
@@ -64,12 +97,16 @@
           deathChecker()
           apple()
           addScore()
-          console.log('playlog: ' + player)
+          // console.log('playlog: ' + player)
           isPlaying = false
         }
-      }, 300 - (score * 30))
+      })
+      setTimeout(player, 300 - Math.min(250, score * 30))
+    // })
 
-    }, 3000);
+    setTimeout(player, 300);
+
+
 
     // })
 
@@ -191,7 +228,7 @@
       if (!record) {
         location.reload()
       } else {
-        location.href='record.jsp?name='+ record +'&score='+ score;
+        location.href = 'record.jsp?name=' + record + '&score=' + score;
       }
 
     }
