@@ -7,7 +7,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Scores</title>
 	<style>
         tr, td, th {
 			border: 1px solid black;
@@ -23,24 +23,33 @@
     Class.forName("com.mysql.cj.jdbc.Driver");
     Connection conn = DriverManager.getConnection("jdbc:mysql://192.168.23.17:3306/kopoctc", "root", "kopoctc");
     Statement stmt = conn.createStatement();
-    
-    request.setCharacterEncoding("UTF-8");
+    %>
+    <table>
+		<tr>
+			<th>Rank</th>
+			<th>Name</th>
+			<th>Score</th>
+		</tr>
+    <% 
+	 
+	String ranking =
+		"select *, rank() over (order by score desc) from snake_score";
+	ResultSet rset = stmt.executeQuery(ranking);
+	while (rset.next()) {
+	%>
+		<tr>
+			<td><%=rset.getInt(3)%></td>
+			<td><%=rset.getString(1)%></td>
+			<td><%=rset.getInt(2)%></td>
 
-    String name = request.getParameter("name");
-    int score = Integer.parseInt(request.getParameter("score"));
-    if (name.length() > 20) {
-        name = name.substring(20);
-    }
-    
-    String insert = String.format(
-        "insert into snake_score values ( '%s', %s );", name, score
-		);
-    stmt.execute(insert);
+		<tr>
+	<%
+	}
+	rset.close();
 	stmt.close();
 	conn.close();
 	%>
-<script>
-location.href='scoreSheet.jsp'
-</script
+	<button onclick="location.href='snakeGame.html'">돌아가기</button>
+
 </body>
 </html>

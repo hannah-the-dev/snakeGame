@@ -14,29 +14,57 @@
       cursor: pointer;
     }
 
-    p {
+    div {
       /* position: absolute; */
       /* top: 40%; */
-      /* display: block; */
+      display: inline-block; 
       color: black;
       /* background-color: black; */
     }
 
     #intro {
-     font-family: 'Noto Sans KR', sans-serif;
+      font-family: 'Noto Sans KR', sans-serif;
     }
+	button {
+	  position: absolute;
+	  left: 500px;
+	}
+	
   </style>
 </head>
 
 <body>
   <!-- <p id="scoring"></p> -->
-  <p id="intro">
-  <span id='sec'>3</span>초 뒤 시작됩니다.</p>
+  <div id="intro">
+    <span id="sec">3</span>초 뒤 시작됩니다.
+  </div>
+  <button onclick="location.href='scoreSheet.jsp'">순위 보기</button>
+  <br>
 
   <canvas id="playground" width="400" height="400">
   </canvas>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script>
+
+
+
+	function isSubmittable(name) {
+		const regex = /[`~!@#$%^&*|\\\'\";:\/?]/gi;
+
+		if (regex.test(name) ||
+			name.includes("[") ||
+			name.includes("]") ||
+			name.includes("(") ||
+			name.includes(")")) {
+			alert("이름에 특수 문자가 포함되어있습니다.");
+			return false;
+
+		} 
+		return true;
+	};
+
+  
+  
     let appleExist = false
     const canvas = document.getElementById("playground")
     const ctx = canvas.getContext("2d")
@@ -47,30 +75,57 @@
     let isPlaying = false
     let score = 0
     let direction = 0 // 0: to right 1: to down 2: to left 3: to up
+    let go = 3;
+    let started = false;
 
-    setTimeout(() => {
+    
+    // starter = setInterval(() => {
+    //     // if(!started) {
+    //       document.getElementById('sec').innerHTML = --go;
+    //       if (go === 0) {
+    //         clearInterval(starter);
+    //         started = true;
+    //       // }
+    //     }
+    //   }, 1000);
+    
+    // let starter = (() => {
+    //   setInterval(() => {
+    //     document.getElementById("sec").innerHTML = --go;
+    //     console.log(go);
+    //     if (go <= 0) {
+    //       clearInterval(starter);
+    //     }
+    //   }, 1000)
+    // })
+    // starter();
+      
+    // let game = (() => {
+      // let game =
+      setTimeout(() => {        
+$('html').keydown(event => {
+  // $('#intro').text("<br>")
+  keyPush(event)
+})
+player = (() => {
+  if (!isPlaying) {
+    isPlaying = true
+    play()
+    defaultMove()
+    positionChecker()
+    deathChecker()
+    apple()
+    addScore()
+    console.log('playlog: ' + player)
+    isPlaying = false
+  }
+  setTimeout(player, 300 - Math.min(score * 40, 250));
+})
+setTimeout(player, 300);
 
-      $('html').keydown(event => {
-        // $('#intro').text("<br>")
-        keyPush(event)
-      })
+}, 3000);
 
-      player = setInterval(() => {
-        if (!isPlaying) {
-          isPlaying = true
-          play()
-          defaultMove()
-          positionChecker()
-          deathChecker()
-          apple()
-          addScore()
-          console.log('playlog: ' + player)
-          isPlaying = false
-        }
-      }, 300 - (score * 30))
-
-    }, 3000);
-
+ 
     // })
 
     let positionX = 0, positionY = 0
@@ -191,7 +246,11 @@
       if (!record) {
         location.reload()
       } else {
-        location.href='record.jsp?name='+ record +'&score='+ score;
+		if (isSubmittable(record)) {
+			location.href = 'record.jsp?name=' + record + '&score=' + score;
+		} else {
+		  terminator();
+		}
       }
 
     }
@@ -217,15 +276,19 @@
 
     function apple() {
       if (appleExist === true) {
-        return
       } else {
-        appleExist = true
         applePositionX = Math.ceil(Math.random() * (tileCount - 1))   //0.0 => 0  1 => 19
         applePositionY = Math.ceil(Math.random() * (tileCount - 1))
+        if (snakeX.includes(applePositionX) && snakeY.includes(applePositionY)) {
+          apple();
+        }
         console.log(applePositionX, applePositionY)
       }
+
       ctx.fillStyle = "red"
       ctx.fillRect(applePositionX * gridSize, applePositionY * gridSize, gridSize - 2, gridSize - 2)
+      appleExist = true
+
     }
     // })
 
