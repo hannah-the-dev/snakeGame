@@ -77,6 +77,7 @@
     let direction = 0 // 0: to right 1: to down 2: to left 3: to up
     let go = 3;
     let started = false;
+	let lap = 0;
 
     
     // starter = setInterval(() => {
@@ -116,7 +117,6 @@ player = (() => {
     deathChecker()
     apple()
     addScore()
-    console.log('playlog: ' + player)
     isPlaying = false
   }
   setTimeout(player, 300 - Math.min(score * 40, 250));
@@ -200,8 +200,6 @@ setTimeout(player, 300);
       if ((positionX === applePositionX) && (positionY === applePositionY)) {
         appleExist = false
         score += 1
-        console.log(snakeX)
-        console.log(snakeY)
       } else {  // if no apple 
         // remove last position and color black
         ctx.fillStyle = "black"
@@ -217,13 +215,10 @@ setTimeout(player, 300);
     }
 
     function deathChecker() {
-      console.log(isAlive)
       if (isAlive) {
         edge()
         for (let snake = 3; snake < snakeX.length; snake++) {
           if (positionX == snakeX[snake] && positionY == snakeY[snake]) {
-            console.log(positionX, positionY)
-            console.log(snakeX[snake], snakeY[snake])
             terminator()
             return false
           }
@@ -281,8 +276,8 @@ setTimeout(player, 300);
         applePositionY = Math.ceil(Math.random() * (tileCount - 1))
         if (snakeX.includes(applePositionX) && snakeY.includes(applePositionY)) {
           apple();
+		  console.log(lap++);
         }
-        console.log(applePositionX, applePositionY)
       }
 
       ctx.fillStyle = "red"
