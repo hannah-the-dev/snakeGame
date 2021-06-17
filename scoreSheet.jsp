@@ -19,6 +19,12 @@
     table {
       border-collapse: collapse;
     }
+
+    div {
+      font-size: x-large;
+      text-align: center;
+    }
+
   </style>
 </head>
 
@@ -26,7 +32,11 @@
   <% Class.forName("com.mysql.cj.jdbc.Driver"); Connection
     conn=DriverManager.getConnection("jdbc:mysql://192.168.23.17:3306/kopoctc", "root" , "kopoctc" ); Statement
     stmt=conn.createStatement(); %>
+    <div>
+      Thank you for playing!
+    </div>
     <table>
+      <div>랭킹</div>
       <tr>
         <th>Rank</th>
         <th>Name</th>
