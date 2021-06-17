@@ -14,10 +14,10 @@
       cursor: pointer;
     }
 
-    p {
+    div {
       /* position: absolute; */
       /* top: 40%; */
-      /* display: block; */
+      display: inline-block; 
       color: black;
       /* background-color: black; */
     }
@@ -25,19 +25,42 @@
     #intro {
       font-family: 'Noto Sans KR', sans-serif;
     }
+	button {
+	  position: absolute;
+	  left: 500px;
+	}
+	
   </style>
 </head>
 
 <body>
   <!-- <p id="scoring"></p> -->
-  <p id="intro">
-    <span id="sec">3</span>초 뒤 시작됩니다.
-  </p>
+  <div id="intro">
+    <span id="sec"></span>초 뒤 시작됩니다.
+  </div>
+  <button onclick="location.href='scoreSheet.jsp'">순위 보기</button>
+  <br>
 
   <canvas id="playground" width="400" height="400">
   </canvas>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script>
+
+    function isSubmittable(name) {
+      const regex = /[`~!@#$%^&*|\\\'\";:\/?]/gi;
+      if (regex.test(name) ||
+        name.includes("[") ||
+        name.includes("]") ||
+        name.includes("(") ||
+        name.includes(")")) {
+        alert("이름에 특수 문자가 포함되어있습니다.");
+        return false;
+      } 
+      return true;
+    };
+
+  
+  
     let appleExist = false
     const canvas = document.getElementById("playground")
     const ctx = canvas.getContext("2d")
@@ -49,34 +72,21 @@
     let score = 0
     let direction = 0 // 0: to right 1: to down 2: to left 3: to up
     let go = 3;
-    let started = false;
+    let pushed = false;
 
     starter = setInterval(() => {
-        // if(!started) {
-          document.getElementById('sec').innerHTML = --go;
-          if (go === 0) {
-            clearInterval(starter);
-            started = true;
-          // }
-        }
-      }, 1000);
+        
+      document.getElementById('sec').innerHTML = go--;
+      if (go === 0) {
+        clearInterval(starter);
+        started = true;
+      }
+    }, 1000);
 
-    // let starter = (() => {
-    //   setInterval(() => {
-    //     document.getElementById("sec").innerHTML = --go;
-    //     console.log(go);
-    //     if (go <= 0) {
-    //       clearInterval(starter);
-    //     }
-    //   }, 1000)
-    // })
-    // starter();
-
-    // let game = (() => {
-    // let game =
-    setTimeout(() => {
+      
+  
+    setTimeout(() => {        
       $('html').keydown(event => {
-        // $('#intro').text("<br>")
         keyPush(event)
       })
       player = (() => {
@@ -89,17 +99,16 @@
           apple()
           addScore()
           isPlaying = false
+          pushed = false
         }
-        setTimeout(player, 300 - Math.min(score * 40, 250));
+        setTimeout(player, 300 - Math.min(score * 20, 250));
       })
       setTimeout(player, 300);
-
     }, 3000);
 
     let positionX = 0, positionY = 0
     const gridSize = 20, tileCount = 20
     let applePositionX = 0, applePositionY = 0
-
 
     let snakeX = new Array()   //records position
     let snakeY = new Array()
@@ -109,34 +118,29 @@
         case 2:
           positionX += -1;
           positionY += 0;
-          // }
           break;
         case 3:
           positionX += 0;
           positionY += -1;
           break;
-        // }
         case 0:
           positionX += 1;
           positionY += 0;
           break;
-        // }
         case 1:
           positionX += 0;
           positionY += 1;
           break;
-        // }
       }
     }
 
     function keyPush(event) {
-      if (!isPlaying) {
+      if (!isPlaying && !pushed) {
         switch (event.code) {
           case 'ArrowLeft':
-            // positionX += -1;
-            // positionY += 0;
             if (direction != 0) {
               direction = 2
+              pushed = true
             }
             break;
           case 'ArrowUp':
@@ -144,6 +148,7 @@
             // positionY += -1;
             if (direction != 1) {
               direction = 3
+              pushed = true
             }
             break;
           case 'ArrowRight':
@@ -151,6 +156,7 @@
             // positionY += 0;
             if (direction != 2) {
               direction = 0
+              pushed = true
             }
             break;
           case 'ArrowDown':
@@ -158,18 +164,17 @@
             // positionY += 1;
             if (direction != 3) {
               direction = 1
+              pushed = true
             }
             break;
-
         }
       }
     }
+
     function positionChecker() {
       if ((positionX === applePositionX) && (positionY === applePositionY)) {
         appleExist = false
         score += 1
-        console.log(snakeX)
-        console.log(snakeY)
       } else {  // if no apple 
         // remove last position and color black
         ctx.fillStyle = "black"
@@ -185,13 +190,10 @@
     }
 
     function deathChecker() {
-      console.log(isAlive)
       if (isAlive) {
         edge()
         for (let snake = 3; snake < snakeX.length; snake++) {
           if (positionX == snakeX[snake] && positionY == snakeY[snake]) {
-            console.log(positionX, positionY)
-            console.log(snakeX[snake], snakeY[snake])
             terminator()
             return false
           }
@@ -214,7 +216,11 @@
       if (!record) {
         location.reload()
       } else {
-        location.href = 'record.jsp?name=' + record + '&score=' + score;
+		if (isSubmittable(record)) {
+			location.href = 'record.jsp?name=' + record + '&score=' + score;
+		} else {
+		  terminator();
+		}
       }
 
     }
