@@ -51,25 +51,16 @@
     let go = 3;
     let started = false;
 
-    let starter = null;
-    // while (go > 0) {
-    //   setTimeout(() => {
-    //     document.getElementById('sec').innerHTML = --go;
-    //   }, 1000)
-    // }
-
     starter = setInterval(() => {
         // if(!started) {
           document.getElementById('sec').innerHTML = --go;
-          console.log(go, go <= 0);
-          if (go <= 0) {
-            return;
+          if (go === 0) {
             clearInterval(starter);
             started = true;
           // }
         }
       }, 1000);
-    
+
     // let starter = (() => {
     //   setInterval(() => {
     //     document.getElementById("sec").innerHTML = --go;
@@ -80,15 +71,15 @@
     //   }, 1000)
     // })
     // starter();
-      
+
     // let game = (() => {
+    // let game =
+    setTimeout(() => {
       $('html').keydown(event => {
         // $('#intro').text("<br>")
         keyPush(event)
-      });
-
+      })
       player = (() => {
-        console.log(Math.min(250, score * 30));
         if (!isPlaying) {
           isPlaying = true
           play()
@@ -97,18 +88,13 @@
           deathChecker()
           apple()
           addScore()
-          // console.log('playlog: ' + player)
           isPlaying = false
         }
+        setTimeout(player, 300 - Math.min(score * 40, 250));
       })
-      setTimeout(player, 300 - Math.min(250, score * 30))
-    // })
+      setTimeout(player, 300);
 
-    setTimeout(player, 300);
-
-
-
-    // })
+    }, 3000);
 
     let positionX = 0, positionY = 0
     const gridSize = 20, tileCount = 20
@@ -253,17 +239,20 @@
     }
 
     function apple() {
-      if (appleExist === true) {
-        return
-      } else {
-        appleExist = true
-        applePositionX = Math.ceil(Math.random() * (tileCount - 1))   //0.0 => 0  1 => 19
-        applePositionY = Math.ceil(Math.random() * (tileCount - 1))
-        console.log(applePositionX, applePositionY)
+      if (!appleExist) {
+        do {
+          applePositionX = Math.ceil(Math.random() * (tileCount - 1))
+          applePositionY = Math.ceil(Math.random() * (tileCount - 1))
+        } while (snakeX.includes(applePositionX)
+          && snakeY.includes(applePositionY))
       }
+
       ctx.fillStyle = "red"
       ctx.fillRect(applePositionX * gridSize, applePositionY * gridSize, gridSize - 2, gridSize - 2)
+      appleExist = true
+
     }
+  
     // })
 
   </script>

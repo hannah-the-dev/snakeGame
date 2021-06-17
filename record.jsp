@@ -28,45 +28,19 @@
 
     String name = request.getParameter("name");
     int score = Integer.parseInt(request.getParameter("score"));
-    if (name.length() > 20) 
+    if (name.length() > 20) {
         name = name.substring(20);
+    }
     
     String insert = String.format(
         "insert into snake_score values ( '%s', %s );", name, score
 		);
     stmt.execute(insert);
-    int updateCount = stmt.getUpdateCount();
-    if (updateCount > 0) {
-    %>
-    <div>
-        <%= name %>'s score <%= score %> has been recorded.
-    </div>
-	<table>
-		<tr>
-			<th>Rank</th>
-			<th>Name</th>
-			<th>Score</th>
-		</tr>
-    <% 
-	} 
-	String ranking =
-		"select *, rank() over (order by score desc) from snake_score";
-	ResultSet rset = stmt.executeQuery(ranking);
-	while (rset.next()) {
-	%>
-		<tr>
-			<td><%=rset.getInt(3)%></td>
-			<td><%=rset.getString(1)%></td>
-			<td><%=rset.getInt(2)%></td>
-
-		<tr>
-	<%
-	}
-	rset.close();
 	stmt.close();
 	conn.close();
 	%>
-	<button onclick="location.href='snakeGame.html'">돌아가기</button>
-
+<script>
+location.href='scoreSheet.jsp'
+</script
 </body>
 </html>
