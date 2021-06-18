@@ -129,6 +129,7 @@
     let direction = 0 // 0: to right 1: to down 2: to left 3: to up
     let go = 3;
     let pushed = false;
+    let speed;
     document.getElementById('sec').innerHTML = go;
     starter = setInterval(() => {
         
@@ -156,8 +157,13 @@
           addScore()
           isPlaying = false
           pushed = false
+          if (score < 12) {
+            speed = 300 - score * 20;
+          } else {
+            speed = 50;
+          }
         }
-        setTimeout(player, 300 - Math.min(score * 20, 250));
+        setTimeout(player, speed);
       })
       setTimeout(player, 300);
     }, 3000);
@@ -305,6 +311,8 @@
         do {
           applePositionX = Math.ceil(Math.random() * (tileCount - 1))
           applePositionY = Math.ceil(Math.random() * (tileCount - 1))
+          console.log(score + ", " + applePositionX + ", " + applePositionY);
+          
         } while (snakeX.includes(applePositionX)
           && snakeY.includes(applePositionY))
       }
@@ -314,8 +322,6 @@
       appleExist = true
 
     }
-  
-    // })
 
   </script>
 </body>
